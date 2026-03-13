@@ -1,0 +1,609 @@
+/* ==========================================
+   1. VARIÁVEIS E TEMA (LIGHT/DARK)
+   ========================================== */
+:root {
+    --bg-color: #f8f9fa;
+    --panel-bg: #ffffff;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #e9ecef;
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --danger-color: #dc3545;
+    --danger-hover: #c82333;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1e1e1e;
+    --panel-bg: #252526;
+    --border-color: #3e3e42;
+    --text-primary: #cccccc;
+    --text-secondary: #858585;
+    --primary-color: #3794ff; 
+    --primary-hover: #1f82e8;
+    --danger-color: #e04756;
+    --danger-hover: #bd3845;
+}
+
+/* ==========================================
+   2. RESET E ESTRUTURA GLOBAL
+   ========================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* Corta vazamentos laterais no celular */
+}
+
+.vertical-divider {
+    border-left: 1px solid var(--border-color);
+    height: 24px;
+    margin: 0 4px;
+}
+
+/* ==========================================
+   3. CABEÇALHO (TOPBAR) E TOOLBAR (DESKTOP)
+   ========================================== */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px; /* ALTURA CRAVADA para o menu mobile calcular perfeitamente */
+    padding: 0 2rem;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border-color);
+    position: relative; 
+    z-index: 2500; /* Fica acima de TUDO na tela */
+}
+
+.logo-placeholder { font-weight: 700; font-size: 1.2rem; letter-spacing: -0.5px; }
+
+.toolbar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: nowrap; /* Impede que os botões caiam para a 2ª linha */
+}
+
+.toolbar-links {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hamburger { display: none !important; }
+
+/* ==========================================
+   4. BOTÕES E ÍCONES (LUCIDE)
+   ========================================== */
+.lucide { width: 18px; height: 18px; stroke-width: 2; }
+.icon-sm { width: 16px; height: 16px; margin-right: 6px; vertical-align: text-bottom; }
+
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;
+    font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+    border: 1px solid transparent; background: transparent;
+}
+
+.btn-primary { background-color: var(--primary-color); color: #fff; }
+.btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+
+.btn-outline { border-color: var(--border-color); color: var(--text-primary); }
+.btn-outline:hover { background-color: var(--bg-color); border-color: var(--primary-color); }
+
+.btn-danger { background-color: var(--danger-color); color: #fff; }
+.btn-danger:hover { background-color: var(--danger-hover); transform: translateY(-1px); }
+
+.btn-danger-outline { border-color: #ffcccc; color: var(--danger-color); }
+.btn-danger-outline:hover { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
+[data-theme="dark"] .btn-danger-outline { border-color: #5a2a2a; color: #ff6b6b; }
+
+.btn-icon { padding: 8px; border-color: var(--border-color); color: var(--text-secondary); border-radius: 6px; }
+.btn-icon:hover { background-color: var(--bg-color); color: var(--primary-color); border-color: var(--primary-color); }
+
+/* Gira o Hamburger suavemente quando clicado */
+/* Animação Perfeita de Morphing do Hamburger para X */
+#mobile-menu-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    overflow: hidden; /* Mantém tudo contido no botão */
+}
+
+#mobile-menu-btn svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* Estado Inicial (Menu visível, X escondido e girado pra esquerda) */
+.icon-menu { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }
+.icon-x { opacity: 0; transform: translate(-50%, -50%) rotate(-90deg); }
+
+/* Estado Ativo (Menu some girando pra direita, X aparece girando ao normal) */
+#mobile-menu-btn.is-active .icon-menu { opacity: 0; transform: translate(-50%, -50%) rotate(90deg); }
+#mobile-menu-btn.is-active .icon-x { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }#mobile-menu-btn.is-active i { transform: rotate(180deg); }
+
+/* ==========================================
+   5. MENUS DROPDOWN (DESKTOP)
+   ========================================== */
+.dropdown-wrapper { position: relative; display: inline-block; }
+
+.dropdown-menu {
+    position: absolute; top: 100%; left: 0; margin-top: 8px;
+    background: var(--panel-bg); border: 1px solid var(--border-color);
+    border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column; z-index: 3000;
+    width: 250px; padding: 6px 0;
+    
+    /* Animação Fade In */
+    opacity: 0; transform: translateY(-10px); pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s;
+}
+#btn-export + .dropdown-menu { left: auto; right: 0; }
+.dropdown-menu.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+[data-theme="dark"] .dropdown-menu { box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+
+/* O estilo limpo dos itens (sem bordas, sem fundo) */
+.dropdown-item {
+    padding: 10px 16px; background: transparent; border: none !important; 
+    text-align: left; cursor: pointer; font-size: 0.9rem; color: var(--text-primary);
+    width: 100%; display: flex; align-items: center; border-radius: 0;
+}
+.dropdown-item:hover { background-color: var(--bg-color); color: var(--primary-color); font-weight: 500; }
+
+/* ==========================================
+   ELEMENTOS DO MENU ARQUIVO (DIVISORES E STATUS)
+   ========================================== */
+.menu-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 6px 0;
+}
+
+/* Deixa o item esmaecido e impossível de clicar */
+.dropdown-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ==========================================
+   SUBMENU ANINHADO (Exportar como...)
+   ========================================== */
+.nested-dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.nested-dropdown-toggle {
+    display: flex;
+    justify-content: space-between; /* Empurra a setinha para a ponta direita */
+    align-items: center;
+}
+
+.nested-menu {
+    top: -6px;
+    left: 100%; /* Faz o menu nascer grudado na borda direita do pai */
+    margin-top: 0;
+    margin-left: 2px;
+}
+
+/* No desktop, o submenu abre ao passar o mouse */
+@media (min-width: 769px) {
+    .nested-dropdown-wrapper:hover .nested-menu {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+}
+
+/* No Mobile, o submenu vira um acordeão infinito */
+@media (max-width: 768px) {
+    .nested-menu {
+        position: static !important;
+        padding-left: 20px !important;
+        margin-top: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-left: 1px solid var(--border-color) !important;
+        border-radius: 0 !important;
+        display: none; 
+    }
+    .nested-dropdown-wrapper.open .nested-menu {
+        display: flex !important; /* Mostrado via JS no celular */
+    }
+}
+
+/* ==========================================
+   6. ÁREA DE TRABALHO E PAINÉIS
+   ========================================== */
+.workspace { display: flex; flex: 1; overflow: hidden; padding: 1rem; gap: 1rem; }
+
+.panel {
+    flex: 1; background-color: var(--panel-bg); border-radius: 8px;
+    border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden;
+}
+
+.panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem; border-bottom: 1px solid var(--border-color);
+}
+.panel-header h2 { font-size: 1rem; font-weight: 600; color: var(--text-secondary); }
+.panel-actions { display: flex; gap: 8px; align-items: center; }
+
+.code-editor {
+    flex: 1; border: none; resize: none; padding: 1rem;
+    font-family: "Courier New", Courier, monospace; font-size: 0.95rem;
+    line-height: 1.5; outline: none; color: var(--text-primary); background-color: transparent;
+}
+
+/* ==========================================
+   7. BARRA DE BUSCA (UX E HIGHLIGHT)
+   ========================================== */
+.search-wrapper { position: relative; display: inline-flex; align-items: center; }
+.search-icon-inside { position: absolute; left: 10px; color: var(--text-secondary); width: 14px; height: 14px; pointer-events: none; }
+.search-input {
+    padding: 0.5rem 0.8rem 0.5rem 32px; border: 1px solid var(--border-color); border-radius: 6px;
+    font-size: 0.85rem; outline: none; background: transparent; color: var(--text-primary); transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--primary-color); }
+.clear-search-btn {
+    position: absolute; right: 8px; background: none; border: none; color: var(--text-secondary);
+    cursor: pointer; display: none; padding: 4px; border-radius: 4px; align-items: center; justify-content: center;
+}
+.clear-search-btn:hover { color: var(--primary-color); background: var(--bg-color); }
+
+.hidden-by-search { display: none !important; }
+.search-results-msg {
+    padding: 1rem; text-align: center; color: var(--text-secondary); font-size: 0.95rem; 
+    background-color: var(--panel-bg); border: 1px dashed var(--border-color); 
+    border-radius: 8px; margin-bottom: 1rem;
+}
+.search-results-msg strong { color: var(--primary-color); }
+
+.search-highlight { background-color: #ffeb3b; color: #212529; border-radius: 3px; padding: 0 2px; }
+[data-theme="dark"] .search-highlight { background-color: #dcb34f; color: #1e1e1e; }
+.no-results-msg {
+    padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.95rem; 
+    background-color: var(--panel-bg); border: 1px dashed var(--border-color); border-radius: 8px; margin-top: 1rem;
+}
+.no-results-msg strong { color: var(--primary-color); }
+
+/* ==========================================
+   8. VISUALIZADOR DE ÁRVORE E LINHAS DE LIGAÇÃO
+   ========================================== */
+.tree-container {
+    flex: 1; padding: 1rem; overflow-y: auto;
+    display: flex; align-items: flex-start; justify-content: flex-start; flex-direction: column;
+}
+.empty-state { color: var(--text-secondary); font-style: italic; align-self: center; margin-top: 2rem;}
+
+.tree-list { list-style: none; padding-left: 24px; position: relative; width: 100%; margin: 0; }
+#tree-view > .tree-list { padding-left: 0; margin-bottom: 60px; }
+.tree-item { position: relative; margin: 0; scroll-margin-bottom: 80px; }
+
+/* As Linhas de Ligação Estilo VS Code */
+.tree-item::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: -12px;
+    width: 1px; background-color: var(--border-color); z-index: 1;
+}
+.tree-item::after {
+    content: ''; position: absolute; top: 17px; left: -12px;
+    width: 12px; height: 1px; background-color: var(--border-color); z-index: 1;
+}
+.tree-item:last-child::before { bottom: auto; height: 18px; }
+#tree-view > .tree-list > .tree-item::before, #tree-view > .tree-list > .tree-item::after { display: none; }
+
+.tree-content {
+    position: relative; display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 4px; transition: background-color 0.2s; cursor: default; z-index: 2;
+}
+.tree-content:hover { background-color: var(--bg-color); }
+.tree-name { font-size: 0.95rem; color: var(--text-primary); }
+
+.tree-icon { width: 18px; height: 18px; }
+.tree-lucide-folder { color: #dcb34f; fill: #f6c045; fill-opacity: 0.2; }
+.tree-lucide-file { color: #8e9bb0; }
+
+/* ==========================================
+   CORES DINÂMICAS POR TIPO DE ARQUIVO
+   ========================================== */
+.file-color-html { color: #e34f26; }     /* Laranja HTML */
+.file-color-css { color: #2965f1; }      /* Azul CSS */
+.file-color-js { color: #d4b830; }       /* Amarelo JS */
+.file-color-json { color: #16a34a; }     /* Verde JSON */
+.file-color-img { color: #a855f7; }      /* Roxo Imagens */
+.file-color-pdf { color: #ef4444; }      /* Vermelho PDF */
+.file-color-doc { color: #2563eb; }      /* Azul Docs (Word) */
+.file-color-xls { color: #10b981; }      /* Verde Excel/Planilhas */
+.file-color-archive { color: #d97706; }  /* Marrom ZIP/RAR */
+.file-color-video { color: #ec4899; }    /* Rosa Vídeos */
+.file-color-audio { color: #14b8a6; }    /* Ciano Áudios */
+.file-color-config { color: #64748b; }   /* Cinza chumbo Configs */
+.file-color-default { color: #8e9bb0; }  /* Cinza padrão */
+
+/* Ajustes suaves e vibrantes para o Dark Mode não cegar o usuário */
+[data-theme="dark"] .file-color-html { color: #f16529; }
+[data-theme="dark"] .file-color-css { color: #438cf5; }
+[data-theme="dark"] .file-color-js { color: #f7df1e; }
+[data-theme="dark"] .file-color-json { color: #4ade80; }
+[data-theme="dark"] .file-color-img { color: #c084fc; }
+[data-theme="dark"] .file-color-pdf { color: #f87171; }
+[data-theme="dark"] .file-color-doc { color: #60a5fa; }
+[data-theme="dark"] .file-color-xls { color: #34d399; }
+[data-theme="dark"] .file-color-archive { color: #fbbf24; }
+[data-theme="dark"] .file-color-video { color: #f472b6; }
+[data-theme="dark"] .file-color-audio { color: #2dd4bf; }
+[data-theme="dark"] .file-color-config { color: #9ca3af; }
+[data-theme="dark"] .file-color-default { color: #9ca3af; }
+
+
+.tree-arrow { width: 16px; display: inline-flex; justify-content: center; align-items: center;}
+.tree-arrow.empty { opacity: 0; pointer-events: none; }
+.tree-arrow-icon { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.is-folder.closed > .tree-content .tree-arrow-icon { transform: rotate(-90deg); }
+.is-folder > .tree-content { cursor: pointer; }
+
+/* Animação Sanfona das Pastas */
+.tree-list-wrapper {
+    display: grid; grid-template-rows: 1fr; opacity: 1;
+    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+.tree-item.closed > .tree-list-wrapper { grid-template-rows: 0fr; opacity: 0; }
+.tree-list-wrapper > .tree-list { overflow: hidden; margin: 0; }
+
+/* ==========================================
+   9. INTERAÇÕES E DRAG AND DROP
+   ========================================== */
+.tree-actions { margin-left: auto; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s ease; }
+.tree-content:hover .tree-actions { opacity: 1; }
+.tree-btn {
+    background: none; border: none; padding: 4px; cursor: pointer;
+    border-radius: 4px; display: flex; align-items: center; transition: all 0.2s ease;
+}
+.tree-add-btn { color: var(--primary-color); }
+.tree-delete-btn { color: var(--danger-color); }
+.tree-btn:hover { background-color: var(--border-color); }
+
+.inline-edit-input {
+    font-family: var(--font-family); font-size: 0.95rem; color: var(--text-primary);
+    background: transparent; border: none; border-bottom: 2px solid var(--primary-color); outline: none; padding: 0; width: 150px;
+}
+[data-theme="dark"] .inline-edit-input { color: #ffffff; }
+
+.tree-item.dragging > .tree-content { opacity: 0.5; background-color: var(--border-color); }
+.tree-content.drag-over-inside { background-color: #e7f1ff; outline: 1px dashed var(--primary-color); }
+[data-theme="dark"] .tree-content.drag-over-inside { background-color: #2a2d2e; }
+.tree-content.drag-over-top::before { content: ''; position: absolute; top: -2px; left: 0; right: 0; height: 2px; background-color: var(--primary-color); z-index: 10; }
+.tree-content.drag-over-bottom::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background-color: var(--primary-color); z-index: 10; }
+
+.tree-view { user-select: none; }
+.tree-content.selected { background-color: var(--primary-color); color: #ffffff; }
+.tree-content.selected .tree-name, .tree-content.selected .tree-icon, .tree-content.selected .tree-arrow-icon, .tree-content.selected .tree-btn { color: #ffffff; }
+
+.add-root-btn {
+    display: block; width: 100%; padding: 10px; margin-top: 1rem; background-color: var(--panel-bg);
+    border: 1px dashed var(--border-color); color: var(--text-secondary); border-radius: 6px; cursor: pointer;
+    text-align: center; font-size: 0.9rem; transition: all 0.2s ease; position: sticky; bottom: 0; z-index: 100;
+    box-shadow: 0 -8px 15px var(--panel-bg);
+}
+.add-root-btn:hover { border-color: var(--primary-color); color: var(--primary-color); background-color: #f0f6ff; }
+[data-theme="dark"] .add-root-btn { box-shadow: 0 -8px 15px var(--panel-bg); }
+[data-theme="dark"] .add-root-btn:hover { background-color: #2a2d2e; }
+.empty-state .add-root-btn { position: static; box-shadow: none; width: auto; border: none; padding: 8px 16px; background-color: var(--primary-color); color: #ffffff; }
+
+/* ==========================================
+   10. MODAIS FLUTUANTES (BASE, ALERTA E TOAST)
+   ========================================== */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
+    z-index: 99999; opacity: 0; transition: opacity 0.3s ease;
+}
+.modal-overlay.show { display: flex; opacity: 1; }
+.modal-content {
+    background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+    position: relative; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.modal-overlay.show .modal-content { transform: scale(1); }
+.modal-close {
+    position: absolute; top: 15px; right: 20px; background: none; border: none; color: var(--text-secondary);
+    cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s ease;
+}
+.modal-close:hover { color: var(--danger-color); background: var(--bg-color); }
+
+.toast-notification {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background-color: var(--primary-color); color: #ffffff; padding: 12px 24px; border-radius: 50px;
+    font-size: 0.95rem; font-weight: 500; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none; z-index: 9999; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+}
+.toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+[data-theme="dark"] .toast-notification { background-color: #ffffff; color: var(--panel-bg); }
+
+
+/* ==========================================
+   MODO VISUALIZAÇÃO (READ-ONLY PARA LINKS COMPARTILHADOS)
+   ========================================== */
+body.view-only-mode .panel:first-child { 
+    display: none; /* Esconde a caixa de código preta inteira */
+}
+
+body.view-only-mode .tree-actions,
+body.view-only-mode .add-root-btn,
+body.view-only-mode #btn-share,
+body.view-only-mode #btn-import,
+body.view-only-mode #btn-templates {
+    display: none !important; /* Esconde botões de +, x, compartilhar e importar */
+}
+
+body.view-only-mode .tree-content {
+    cursor: default; /* Tira o cursor de "arrastar" dos arquivos */
+}
+
+body.view-only-mode .is-folder > .tree-content {
+    cursor: pointer; /* Mantém o clique apenas para abrir/fechar pastas */
+}
+/* Esconde o Menu Arquivo e Meus Projetos para os visitantes */
+body.view-only-mode #btn-arquivo,
+body.view-only-mode #btn-my-projects {
+    display: none !important;
+}
+
+/* ==========================================
+   BANNER PROMOCIONAL (GROWTH)
+   ========================================== */
+.promo-banner {
+    display: none; /* Escondido por padrão */
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 16px 24px;
+    border-radius: 12px;
+    z-index: 1000;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 650px;
+}
+
+/* O banner SÓ aparece se o body tiver a classe view-only-mode */
+body.view-only-mode .promo-banner {
+    display: flex;
+}
+
+.promo-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.promo-content strong {
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+
+/* ==========================================
+   11. MENU SIDEBAR (MOBILE OFF-CANVAS)
+   ========================================== */
+@media (max-width: 768px) {
+    .hamburger { display: inline-flex !important; }
+    .workspace { flex-direction: column; overflow-y: auto; }
+    .panel { min-height: 400px; }
+
+    /* A NOVA SIDEBAR DA DIREITA */
+    .toolbar-links {
+        position: fixed !important; 
+        top: 70px !important;           /* Nasce milimetricamente debaixo da barra do topo (70px) */
+        right: -320px !important;       /* Começa fora da tela */
+        width: 280px !important;
+        height: calc(100vh - 70px) !important; /* Pega a altura inteira, descontando o topo */
+        background-color: #f1f3f5 !important;  /* Cinza elegante para contrastar */
+        flex-direction: column !important;
+        align-items: stretch !important;       /* Estica os botões para preencherem tudo */
+        padding: 20px !important;
+        box-shadow: -4px 0 15px rgba(0,0,0,0.1) !important;
+        z-index: 2000 !important;
+        
+        /* Limpa lixos do desktop e adiciona o deslize da direita */
+        transform: none !important;
+        opacity: 1 !important;
+        transition: right 0.3s ease-in-out !important;
+    }
+    
+    [data-theme="dark"] .toolbar-links { 
+        background-color: #1a1a1c !important; 
+        border-left: 1px solid var(--border-color) !important; 
+    }
+
+    .toolbar-links.show { 
+        right: 0 !important; /* Desliza e invade a tela! */
+    }
+
+    /* Tira os botões do formato linha e os empilha no mobile */
+    .dropdown-wrapper { width: 100%; display: flex; flex-direction: column; }
+    .toolbar-links .btn { width: 100%; justify-content: flex-start; }
+
+    /* TRANSFORMA O DROPDOWN EM ACORDEÃO NO MOBILE */
+    .dropdown-menu {
+        position: static !important; 
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 0 0 15px !important; /* Dá um recuo visual (indentação) */
+        margin: 0 !important;
+        display: none !important; 
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    
+    .dropdown-menu.show { display: flex !important; }
+
+    /* Transforma a barra vertical em linha separadora horizontal */
+    .toolbar-links .vertical-divider {
+        width: 100%; height: 1px; border-left: none;
+        border-top: 1px solid var(--border-color); margin: 10px 0;
+    }
+}
+/* ==========================================
+   AJUSTES RESPONSIVOS: NOME DO PROJETO
+   ========================================== */
+#project-title-badge {
+    max-width: 300px; /* Limite no PC */
+}
+
+@media (max-width: 768px) {
+    #project-title-badge {
+        max-width: 130px; /* Esmaga no celular, mas deixa espaço pros 3 pontinhos */
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    #autosave-status {
+        display: none !important; /* Esconde o "Salvo automaticamente" no celular */
+    }
+}
+
+@media (max-width: 400px) {
+    #project-title-badge {
+        max-width: 90px; /* Telas muito pequenas (iPhone SE) */
+    }
+}
+
+
+
+/* SELO SUPABASE */
+.supabase-badge {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 900;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.7;
+}
+.supabase-badge:hover {
+    transform: translateY(-2px);
+    opacity: 1;
+}
+@media (max-width: 768px) {
+    .supabase-badge { bottom: 12px; right: 12px; }
+}

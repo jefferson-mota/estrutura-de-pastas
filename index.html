@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TreeSim - Simulador de Estrutura de Arquivos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="logo-placeholder">TreeSim</div>
+            <div id="project-title-badge" style="font-size: 0.85rem; padding: 4px 12px; background: var(--bg-color); border-radius: 20px; color: var(--text-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                <span id="project-name-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">Sem Título</span>
+                
+                <span id="unsaved-indicator" style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--danger-color); display: none; flex-shrink: 0;" title="Alterações não salvas"></span>
+            </div>
+            <span id="autosave-status" style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0; transition: opacity 0.3s;">Salvo automaticamente</span>
+        </div>
+        
+       <nav class="toolbar">
+        <div class="toolbar-links" id="toolbar-links">
+            
+            <div class="dropdown-wrapper">
+                <button class="btn btn-primary" id="btn-arquivo" style="width: 100%; justify-content: flex-start; background-color: #0ea5e9; border-color: #0ea5e9;">
+                    Arquivo <i data-lucide="chevron-down" class="icon-sm" style="margin-left: 4px; margin-right: 0;"></i>
+                </button>
+                
+                <div class="dropdown-menu" id="menu-arquivo-dropdown">
+                    <button class="dropdown-item" id="menu-novo"><i data-lucide="file-plus" class="icon-sm"></i> Novo</button>
+                    <button class="dropdown-item" id="menu-importar"><i data-lucide="upload" class="icon-sm"></i> Importar...</button>
+                    <input type="file" id="file-import" accept=".txt,.json" style="display: none;">
+                    <button class="dropdown-item" id="menu-meus-projetos"><i data-lucide="folder-heart" class="icon-sm"></i> Meus Projetos</button>
+                    
+                    <div class="menu-divider"></div>
+                    
+                    <button class="dropdown-item disabled" id="menu-salvar"><i data-lucide="save" class="icon-sm"></i> Salvar</button>
+                    <button class="dropdown-item disabled" id="menu-renomear"><i data-lucide="text-cursor-input" class="icon-sm"></i> Renomear Projeto</button>
+                    
+                    <div class="menu-divider"></div>
+                    
+                    <div class="nested-dropdown-wrapper">
+                        <button class="dropdown-item nested-dropdown-toggle" id="btn-export-nested">
+                            <span><i data-lucide="download" class="icon-sm"></i> Exportar como...</span>
+                            <i data-lucide="chevron-right" class="icon-sm" style="margin: 0;"></i>
+                        </button>
+                        <div class="dropdown-menu nested-menu">
+                            <button class="dropdown-item disabled" id="menu-exp-png"><i data-lucide="image" class="icon-sm"></i> Imagem (.PNG)</button>
+                            <button class="dropdown-item disabled" id="menu-exp-zip"><i data-lucide="folder-archive" class="icon-sm"></i> Pastas (.ZIP)</button>
+                            <button class="dropdown-item disabled" id="menu-exp-json"><i data-lucide="file-json" class="icon-sm"></i> Estrutura (.JSON)</button>
+                            <button class="dropdown-item disabled" id="menu-exp-txt"><i data-lucide="file-text" class="icon-sm"></i> Texto (.TXT)</button>
+                        </div>
+                    </div>
+
+                    <div class="menu-divider"></div>
+                    
+                    <button class="dropdown-item disabled" id="menu-compartilhar"><i data-lucide="share-2" class="icon-sm"></i> Compartilhar Link</button>
+                    
+                        <div class="menu-divider"></div>
+                    
+                            <button class="dropdown-item disabled" id="menu-fechar"><i data-lucide="x-circle" class="icon-sm"></i> Fechar Projeto</button>
+                            <button class="dropdown-item" id="menu-sair-app"><i data-lucide="power" class="icon-sm"></i> Fechar Aplicação</button>
+                            <div class="menu-divider"></div>
+                            <button id="menu-sobre" class="dropdown-item menu-item"><i data-lucide="info" class="icon-sm"></i> Sobre o TreeSim</button>
+                </div>
+            </div>
+
+            <div class="dropdown-wrapper">
+                <button class="btn btn-outline" id="btn-templates" style="width: 100%; justify-content: flex-start;"><i data-lucide="layout-template" class="icon-sm"></i> Templates<i data-lucide="chevron-down" class="icon-sm" style="margin-left: 4px; margin-right: 0;"></i></button>
+            </div>
+            
+            <span class="vertical-divider" style="width: 100%; height: 1px; border-top: 1px solid var(--border-color); margin: 5px 0;"></span>
+            
+            <button class="btn btn-outline" id="btn-mindmap" style="width: 100%; justify-content: flex-start;"><i data-lucide="git-branch" class="icon-sm"></i> Fluxograma</button>
+
+        </div> 
+            
+            <!--<button class="btn btn-primary" id="btn-share" style="width: 100%; justify-content: flex-start; background-color: #10b981; border-color: #10b981;"><i data-lucide="share-2" class="icon-sm"></i> Compartilhar</button>-->
+        
+        
+        <button class="btn btn-icon" id="theme-toggle" title="Alternar Tema"><i data-lucide="moon"></i></button>
+        
+        <button class="btn btn-outline" id="btn-login-modal" style="margin-left: 8px;">
+            <i data-lucide="user" class="icon-sm"></i> <span id="user-name-display">Entrar</span>
+        </button>
+
+        <button class="btn btn-icon hamburger" id="mobile-menu-btn">
+            <i data-lucide="menu" class="icon-menu"></i>
+            <i data-lucide="x" class="icon-x"></i>
+        </button>
+    </nav>
+    </header>
+
+    <main class="workspace">
+        
+        <section class="panel text-panel">
+            <div class="panel-header">
+                <h2>Editor de Texto</h2>
+                <div class="panel-actions">
+                    <button class="btn btn-icon" id="btn-undo" title="Desfazer (Ctrl+Z)"><i data-lucide="undo-2"></i></button>
+                    <button class="btn btn-icon" id="btn-redo" title="Refazer (Ctrl+Y)"><i data-lucide="redo-2"></i></button>
+                    <span class="vertical-divider"></span>
+                    <button class="btn btn-outline btn-danger-outline" id="btn-clear"><i data-lucide="trash-2" class="icon-sm"></i> Limpar</button>
+                </div>
+            </div>
+            <textarea class="code-editor" placeholder="Digite a estrutura aqui...&#10;&#10;Exemplo:&#10;Projeto/&#10;  Assets/&#10;    logo.svg&#10;  index.html"></textarea>
+        </section>
+
+        <section class="panel visual-panel">
+            <div class="panel-header">
+                <h2>Visualizador Interativo</h2>
+                <div class="panel-actions">
+                    <button class="btn btn-icon" id="btn-expand-all" title="Expandir Todas as Pastas"><i data-lucide="chevrons-down"></i></button>
+                    <button class="btn btn-icon" id="btn-collapse-all" title="Recolher Todas as Pastas"><i data-lucide="chevrons-up"></i></button>
+                    
+                    <span class="vertical-divider"></span>
+                    
+                    <div class="search-wrapper">
+                        <i data-lucide="search" class="search-icon-inside"></i>
+                        <input type="text" id="search-input" class="search-input" placeholder="Buscar...">
+                    </div>
+                </div>
+            </div>
+            <div class="tree-container" id="tree-view">
+                <div class="empty-state">
+                    A estrutura visual aparecerá aqui...
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="modal-overlay" id="modal-projects">
+        <div class="modal-content" style="width: 100%; max-width: 500px;">
+            <button class="modal-close" id="close-projects"><i data-lucide="x"></i></button>
+            <h2 style="margin-bottom: 1.5rem;"><i data-lucide="folder-heart" class="icon-sm"></i> Meus Projetos na Nuvem</h2>
+            
+            <div id="projects-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;">
+                <p style="text-align: center; color: var(--text-secondary); padding: 1rem;">Carregando...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-auth">
+        <div class="modal-content" style="width: 100%; max-width: 400px;">
+            <button class="modal-close" id="close-auth"><i data-lucide="x"></i></button>
+            
+            <h2 style="margin-bottom: 0.5rem;" id="auth-title">Acesse sua Conta</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;" id="auth-subtitle">Salve seus projetos na nuvem e acesse de qualquer lugar.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 500;">E-mail</label>
+                    <input type="email" id="auth-email" class="search-input" style="width: 100%; padding-left: 10px;" placeholder="seu@email.com">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 500;">Senha</label>
+                    <input type="password" id="auth-password" class="search-input" style="width: 100%; padding-left: 10px;" placeholder="••••••••">
+                </div>
+
+                <button class="btn btn-primary" id="btn-submit-auth" style="width: 100%; margin-top: 10px; padding: 10px;">Entrar</button>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.85rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <span id="auth-toggle-text">Não tem uma conta?</span> 
+                <a href="#" id="auth-toggle-link" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Criar conta grátis</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="modal-mindmap" class="modal-content" style="max-width: 900px; width: 90%;">
+            <button class="modal-close" id="close-mindmap"><i data-lucide="x"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="git-branch"></i> Fluxograma do Projeto
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">Uma visão macro e hierárquica de toda a sua estrutura.</p>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                <button class="btn btn-primary" id="btn-export-mindmap"><i data-lucide="image" class="icon-sm"></i> Baixar Imagem (.PNG)</button>
+                <button class="btn btn-outline" id="btn-export-svg"><i data-lucide="pen-tool" class="icon-sm"></i> Baixar Vetor (.SVG)</button>
+            </div>
+            
+            <div id="mindmap-container" style="overflow: auto; padding: 20px; border-radius: 8px; border: 1px dashed var(--border-color);"></div>
+        </div>
+    </div>
+
+    <div id="modal-confirm" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <h3 id="confirm-title" style="margin-bottom: 15px; color: var(--text-primary); font-size: 1.3rem;">Atenção</h3>
+            <p id="confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5; font-size: 0.95rem;"></p>
+            <div id="confirm-buttons" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;"></div>
+        </div>
+    </div>
+
+    <div id="modal-sobre" class="modal-overlay">
+        <div class="modal-content" style="max-width: 350px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; position: relative;">
+                <h3 style="margin: 0;">Sobre</h3>
+                <!--<button id="close-sobre" class="btn-icon" style="position: absolute; right: 0;"><i data-lucide="x">--></i></button><button class="modal-close" id="close-sobre"><i data-lucide="x"></i></button>
+            </div>
+            <div style="padding: 24px 0;">
+                <div style="width: 64px; height: 64px; background: var(--primary-color); border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <i data-lucide="folder-tree" style="color: white; width: 32px; height: 32px;"></i>
+                </div>
+                <h2 style="margin: 0; color: var(--text-color);">TreeSim</h2>
+                <p style="color: var(--primary-color); font-weight: 600; font-size: 0.9rem; margin-top: 4px; margin-bottom: 16px;">v1.0.0</p>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+                    A ferramenta definitiva para criar, documentar e exportar arquiteturas de diretórios e mapas mentais.
+                </p>
+                <div style="border-top: 1px solid var(--border-color); padding-top: 16px; font-size: 0.8rem; color: var(--text-secondary);">
+                    <p style="margin: 4px 0;">Design & Code by <strong>Jeff Mota</strong></p>
+                    <p style="margin: 4px 0;">&copy; 2026. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://supabase.com" target="_blank" class="supabase-badge" title="Powered by Supabase">
+        <img src="https://supabase.com/badge-made-with-supabase-dark.svg" alt="Made with Supabase" style="height: 24px;">
+    </a>
+
+    <div id="promo-banner" class="promo-banner">
+        
+        <div style="width: 100%; border-radius: 6px; overflow: hidden; background-color: var(--border-color); display: flex; justify-content: center; margin-bottom: 8px;">
+            <img src="https://via.placeholder.com/600x100/2a2a2a/888888?text=Espa%C3%A7o+para+o+seu+GIF+Animado" alt="TreeSim Demo" style="width: 100%; height: auto; display: block; max-height: 120px; object-fit: cover;">
+        </div>
+
+        <div class="promo-content" style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <i data-lucide="git-merge" style="color: var(--primary-color); width: 18px; height: 18px;"></i>
+                <strong>Estrutura gerada no TreeSim</strong>
+            </div>
+            <p>Documente arquiteturas arrastando pastas. Gere mapas mentais e baixe o <b>.ZIP grátis!</b></p>
+        </div>
+        <a href="?" class="btn btn-primary" style="white-space: nowrap; align-self: flex-end; margin-top: 8px;"><i data-lucide="zap" class="icon-sm"></i> Criar meu TreeSim</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.4.3/mermaid.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
