@@ -1436,6 +1436,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const authEmail = document.getElementById('auth-email');
     const authPassword = document.getElementById('auth-password');
     const btnSubmitAuth = document.getElementById('btn-submit-auth');
+    // Ação de Login com o Google
+    const btnGoogleLogin = document.getElementById('btn-google-login');
+    if (btnGoogleLogin && window.supabase) {
+        btnGoogleLogin.addEventListener('click', async () => {
+            const textoOriginal = btnGoogleLogin.innerHTML;
+            btnGoogleLogin.innerHTML = '<i data-lucide="loader" class="icon-sm"></i> Conectando...';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        // É essencial colocar o link do Netlify aqui para ele saber pra onde voltar depois de logar!
+                        redirectTo: 'https://treesimapp.netlify.app' 
+                    }
+                });
+                if (error) throw error;
+                // Nota: Não precisamos fechar o modal aqui, porque o navegador vai ser redirecionado para a página do Google.
+            } catch (err) {
+                console.error("Erro no login com Google:", err);
+                alert("Erro ao tentar conectar com o Google.");
+                btnGoogleLogin.innerHTML = textoOriginal;
+            }
+        });
+    }
     const authToggleLink = document.getElementById('auth-toggle-link');
     const authTitle = document.getElementById('auth-title');
     const authSubtitle = document.getElementById('auth-subtitle');
@@ -1934,3 +1959,4 @@ document.addEventListener('DOMContentLoaded', () => {
         saveHistoryState();
     });
 });
+
