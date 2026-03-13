@@ -1218,9 +1218,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function exportToPng() {
         if (editor.value.trim() === '') return showToast("⚠️ A estrutura está vazia!");
-        if (typeof html2canvas === 'undefined') return showToast("❌ Erro: html2canvas não encontrado.");
+        if (typeof htmlToImage === 'undefined') return showToast("❌ Erro: html-to-image não encontrado.");
 
-        // Abre a janela do Windows PRIMEIRO, de forma instantânea!
         const handle = await getFileHandle("Estrutura_Visual.png", { 'image/png': ['.png'] }, "Imagem PNG");
         if (handle === 'CANCELLED') return;
 
@@ -1245,17 +1244,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const bgColor = window.getComputedStyle(document.body).getPropertyValue('--panel-bg').trim() || '#ffffff';
             
-            // REMOVIDO o useCORS para não causar travamentos no arquivo local!
-            const canvas = await html2canvas(treeContainer, {
+            // O NOVO MOTOR SUPER RÁPIDO AQUI
+            const blob = await htmlToImage.toBlob(treeContainer, {
                 backgroundColor: bgColor,
-                scale: 2,
-                scrollY: -window.scrollY 
+                pixelRatio: 2 // Garante a alta resolução HD
             });
             
-            canvas.toBlob(async (blob) => {
-                await writeBlobToFile(blob, handle, "Estrutura_Visual.png");
-                showToast("✅ Imagem salva com sucesso!");
-            });
+            await writeBlobToFile(blob, handle, "Estrutura_Visual.png");
+            showToast("✅ Imagem salva com sucesso!");
+            
         } catch (error) {
             console.error(error);
             showToast("❌ Erro ao exportar imagem.");
@@ -1376,7 +1373,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const svgElement = mindmapContainer.querySelector('svg');
             if (!svgElement) return showToast("⚠️ O fluxograma ainda não foi gerado.");
 
-            // Abre a janela do Windows PRIMEIRO!
             const handle = await getFileHandle("Fluxograma_Projeto.png", { 'image/png': ['.png'] }, "Imagem PNG");
             if (handle === 'CANCELLED') return;
 
@@ -1387,18 +1383,17 @@ document.addEventListener('DOMContentLoaded', () => {
             mindmapContainer.style.overflow = 'visible';
 
             try {
-                // SEM CORS também!
-                const canvas = await html2canvas(mindmapContainer, {
+                // O NOVO MOTOR AQUI TAMBÉM
+                const blob = await htmlToImage.toBlob(mindmapContainer, {
                     backgroundColor: bgColor,
-                    scale: 2 
+                    pixelRatio: 2
                 });
 
                 mindmapContainer.style.overflow = originalOverflow;
 
-                canvas.toBlob(async (blob) => {
-                    await writeBlobToFile(blob, handle, "Fluxograma_Projeto.png");
-                    showToast("✅ Imagem do Fluxograma salva!");
-                });
+                await writeBlobToFile(blob, handle, "Fluxograma_Projeto.png");
+                showToast("✅ Imagem do Fluxograma salva!");
+                
             } catch (error) {
                 mindmapContainer.style.overflow = originalOverflow;
                 console.error(error);
