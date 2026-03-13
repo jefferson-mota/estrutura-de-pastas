@@ -606,4 +606,13 @@ body.view-only-mode .promo-banner {
 }
 @media (max-width: 768px) {
     .supabase-badge { bottom: 12px; right: 12px; }
+
+}
+/* FOTO DO USUÁRIO NO MENU */
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
 }
