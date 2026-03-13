@@ -1553,24 +1553,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.supabase) {
         supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
+                // Usuário LOGADO
                 currentUser = session.user;
-                const nomeCurto = currentUser.email.split('@')[0]; 
-                if (userNameDisplay) userNameDisplay.textContent = nomeCurto;
+                
+                // Tenta pegar o primeiro nome do Google, se não tiver, pega o começo do e-mail
+                const nomeCompleto = currentUser.user_metadata?.full_name;
+                const nomeCurto = nomeCompleto ? nomeCompleto.split(' ')[0] : currentUser.email.split('@')[0]; 
+                
+                // Tenta pegar a foto do Google
+                const avatarUrl = currentUser.user_metadata?.avatar_url;
+
                 if (btnLoginModal) {
-                    const icon = btnLoginModal.querySelector('i');
-                    if (icon) icon.setAttribute('data-lucide', 'log-out');
-                    btnLoginModal.classList.remove('btn-outline');
-                    btnLoginModal.classList.add('btn-primary');
+                    // Limpa as classes pesadas do botão para ele ficar mais elegante e discreto
+                    btnLoginModal.className = 'btn'; 
+                    btnLoginModal.style.padding = '6px 12px';
+                    btnLoginModal.style.background = 'transparent';
+                    btnLoginModal.style.border = '1px solid var(--border-color)';
+
+                    if (avatarUrl) {
+                        // Se tem foto (Logou pelo Google)
+                        btnLoginModal.innerHTML = `
+                            <img src="${avatarUrl}" alt="Avatar" class="user-avatar">
+                            <span id="user-name-display">${nomeCurto}</span>
+                        `;
+                    } else {
+                        // Se não tem foto (Logou por E-mail)
+                        btnLoginModal.innerHTML = `
+                            <i data-lucide="user" class="icon-sm"></i>
+                            <span id="user-name-display">${nomeCurto}</span>
+                        `;
+                    }
                 }
                 if (btnMyProjects) btnMyProjects.style.display = 'inline-flex';
             } else {
+                // Usuário DESLOGADO
                 currentUser = null;
-                if (userNameDisplay) userNameDisplay.textContent = 'Entrar';
                 if (btnLoginModal) {
-                    const icon = btnLoginModal.querySelector('i');
-                    if (icon) icon.setAttribute('data-lucide', 'user');
-                    btnLoginModal.classList.add('btn-outline');
-                    btnLoginModal.classList.remove('btn-primary');
+                    // Volta o botão ao visual original de "Entrar"
+                    btnLoginModal.className = 'btn btn-outline';
+                    btnLoginModal.style.padding = '';
+                    btnLoginModal.style.background = '';
+                    btnLoginModal.style.border = '';
+                    
+                    btnLoginModal.innerHTML = `
+                        <i data-lucide="user" class="icon-sm"></i>
+                        <span id="user-name-display">Entrar</span>
+                    `;
                 }
                 if (btnMyProjects) btnMyProjects.style.display = 'none';
             }
@@ -1959,4 +1987,5 @@ document.addEventListener('DOMContentLoaded', () => {
         saveHistoryState();
     });
 });
+
 
